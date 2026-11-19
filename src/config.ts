@@ -83,7 +83,10 @@ export const siteConfig = {
 
   secret: {
     label: 'Küçük bir kalp',
-    message: 'Bunu bulan sensin. Söylemediğim her şeyin özeti şu: iyi ki sen.',
+    message: 'Sen benim başıma gelen en güzel şey.\n
+          Anlamı yok, anlamsız sen yoksan her şey.\n
+          Beni yine sev, beni yine sev, beni yeniden sev.\n
+          Sensiz bu dünya gözümde hiçbi şey',
     close: 'Kapat',
   },
 
