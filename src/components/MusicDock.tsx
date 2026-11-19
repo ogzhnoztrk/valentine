@@ -13,7 +13,10 @@ export function MusicDock() {
   }
 
   return (
-    <div className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 flex flex-col items-end">
+    <div
+      data-music-dock
+      className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 flex flex-col items-end"
+    >
       <div className="relative">
         <span className="music-breathe pointer-events-none absolute inset-[-6px] rounded-full" aria-hidden />
         <span className="music-breathe music-breathe-delay pointer-events-none absolute inset-[-6px] rounded-full" aria-hidden />

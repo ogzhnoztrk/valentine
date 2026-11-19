@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { siteConfig } from '../../config.ts'
 import { useTypewriter } from '../../hooks/useTypewriter.ts'
 import { wait } from '../../lib/wait.ts'
+import { useMusic } from '../../music/useMusic.ts'
 import { HeartMark } from '../HeartMark.tsx'
 import { MagneticButton } from '../MagneticButton.tsx'
 
@@ -19,6 +20,7 @@ type Phase = 'idle' | 'inhale' | 'burst' | 'flash'
 
 export function OpeningScene({ onDone }: { onDone: () => void }) {
   const reduced = useReducedMotion() === true
+  const music = useMusic()
   const [phase, setPhase] = useState<Phase>('idle')
   const [lineReady, setLineReady] = useState(reduced)
   const started = useRef(false)
@@ -55,6 +57,8 @@ export function OpeningScene({ onDone }: { onDone: () => void }) {
   async function openSurprise() {
     if (started.current) return
     started.current = true
+    // Kullanıcı jesti: müzik burada güvenle açılır.
+    music.ensurePlaying()
     if (reduced) {
       onDone()
       return

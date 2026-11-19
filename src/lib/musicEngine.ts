@@ -107,9 +107,21 @@ export class MusicEngine {
     this.ramp(this.volume, 700)
   }
 
+  preload(url: string) {
+    if (this.disposed) return
+    const audio = this.ensureAudio()
+    const absolute = new URL(url, window.location.href).href
+    if (this.fileUrl === absolute) return
+    this.fileUrl = absolute
+    audio.preload = 'auto'
+    audio.src = url
+    audio.load()
+  }
+
   async playFile(url: string) {
     if (this.disposed) return
     const operation = ++this.operation
+    // Jest kaybolmasın diye play()'den önce await yok.
     this.prime()
     this.playing = false
     this.stopScheduler()
@@ -120,10 +132,11 @@ export class MusicEngine {
     if (this.fileUrl !== absolute) {
       this.fileUrl = absolute
       audio.src = url
-      audio.currentTime = 0
     }
+    audio.currentTime = 0
     audio.volume = 0
-    await audio.play()
+    const playAttempt = audio.play()
+    await playAttempt
     if (this.disposed || this.operation !== operation) {
       audio.pause()
       return

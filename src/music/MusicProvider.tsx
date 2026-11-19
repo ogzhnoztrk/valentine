@@ -2,10 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { siteConfig } from '../config.ts'
 import { asset } from '../lib/assets.ts'
 import { MusicEngine } from '../lib/musicEngine.ts'
-import { canLoadAsset } from '../lib/probe.ts'
 import { MusicContext } from './context.ts'
 
 const tracks = siteConfig.music.tracks
+
+function isGestureBlocked(error: unknown) {
+  return error instanceof DOMException && (error.name === 'NotAllowedError' || error.name === 'AbortError')
+}
 
 export function MusicProvider({ children }: { children: ReactNode }) {
   const engineRef = useRef<MusicEngine | null>(null)
@@ -41,6 +44,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(id)
   }, [hint])
 
+  // Dosyayı önceden yükle; jest anında play() hemen çalışsın.
+  useEffect(() => {
+    const track = tracks[0]
+    if (!track?.src) return
+    getEngine().preload(asset(track.src))
+  }, [getEngine])
+
   const start = useCallback(
     async (trackIndex: number) => {
       const engine = getEngine()
@@ -51,17 +61,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
 
       try {
         if (track.src) {
-          const url = asset(track.src)
-          const available = await canLoadAsset(url)
-          if (requestId !== requestRef.current) return
-          if (!available) {
-            playingRef.current = false
-            setPlaying(false)
-            setHint(siteConfig.music.missingHint)
-            await engine.pause()
-            return
-          }
-          await engine.playFile(url)
+          // canLoadAsset await'i jest'i bozuyordu — doğrudan çal.
+          await engine.playFile(asset(track.src))
         } else {
           await engine.playSynth()
         }
@@ -70,10 +71,12 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         autoUnlockRef.current = false
         setPlaying(true)
         setHint(null)
-      } catch {
+      } catch (error) {
         if (requestId !== requestRef.current) return
         playingRef.current = false
         setPlaying(false)
+        // Autoplay engeli: sessiz kal, ilk dokunuşta tekrar dene.
+        if (isGestureBlocked(error) && autoUnlockRef.current) return
         setHint(track.src ? siteConfig.music.missingHint : siteConfig.music.unsupported)
       }
     },
@@ -101,11 +104,11 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     void start(indexRef.current)
   }, [start])
 
-  // Site açılınca müzik dene; tarayıcı engellerse ilk dokunuşta başlat.
+  // Site açılınca dene; tarayıcı engellerse ilk jestte hemen başlat.
   useEffect(() => {
     void start(0)
 
-    const unlock = () => {
+    const unlock = (event: Event) => {
       if (!autoUnlockRef.current) {
         window.removeEventListener('pointerdown', unlock, true)
         window.removeEventListener('keydown', unlock, true)
@@ -116,6 +119,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         autoUnlockRef.current = false
         return
       }
+      // Müzik dock kendi toggle'ını kullansın.
+      if (event.target instanceof Element && event.target.closest('[data-music-dock]')) return
       void start(indexRef.current)
     }
 
