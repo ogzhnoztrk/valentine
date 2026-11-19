@@ -83,10 +83,11 @@ export const siteConfig = {
 
   secret: {
     label: 'Küçük bir kalp',
-    message: 'Sen benim başıma gelen en güzel şey.\n
-          Anlamı yok, anlamsız sen yoksan her şey.\n
-          Beni yine sev, beni yine sev, beni yeniden sev.\n
-          Sensiz bu dünya gözümde hiçbi şey',
+  message: `Sen benim başıma gelen en güzel şey.
+
+Anlamı yok, anlamsız sen yoksan her şey.
+Beni yine sev, beni yine sev, beni yeniden sev.
+Sensiz bu dünya gözümde hiçbir şey.`,
     close: 'Kapat',
   },
 
