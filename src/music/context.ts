@@ -7,6 +7,8 @@ export type MusicControls = {
   track: MusicTrack
   hint: string | null
   toggle: () => void
+  /** Tarayıcı engellerse ilk dokunuşta / butonda müzik başlatır. */
+  ensurePlaying: () => void
   next: () => void
   previous: () => void
   setVolume: (value: number) => void

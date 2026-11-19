@@ -7,40 +7,42 @@ import { useMusic } from '../music/useMusic.ts'
 export function MusicDock() {
   const music = useMusic()
   const [open, setOpen] = useState(false)
-  const [touched, setTouched] = useState(false)
 
   function togglePlay() {
-    setTouched(true)
     music.toggle()
   }
 
   return (
     <div className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 flex flex-col items-end">
-      <div className={cn('glass flex items-center rounded-full p-1', !touched && 'music-nudge')}>
-        <button
-          type="button"
-          className="grid h-10 w-10 place-items-center rounded-full"
-          onClick={togglePlay}
-          aria-label={music.playing ? 'Müziği duraklat' : 'Müziği çal'}
-        >
-          {music.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
-        </button>
-        {music.playing && (
-          <span className="mr-1 flex h-3 items-end gap-0.5" aria-hidden>
-            <span className="eq-bar" />
-            <span className="eq-bar" style={{ animationDelay: '0.15s' }} />
-            <span className="eq-bar" style={{ animationDelay: '0.3s' }} />
-          </span>
-        )}
-        <button
-          type="button"
-          className="grid h-10 w-8 place-items-center"
-          aria-expanded={open}
-          aria-label="Şarkı ve ses"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
-        </button>
+      <div className="relative">
+        <span className="music-breathe pointer-events-none absolute inset-[-6px] rounded-full" aria-hidden />
+        <span className="music-breathe music-breathe-delay pointer-events-none absolute inset-[-6px] rounded-full" aria-hidden />
+        <div className="glass relative flex items-center rounded-full p-1">
+          <button
+            type="button"
+            className="grid h-10 w-10 place-items-center rounded-full"
+            onClick={togglePlay}
+            aria-label={music.playing ? 'Müziği duraklat' : 'Müziği çal'}
+          >
+            {music.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
+          </button>
+          {music.playing && (
+            <span className="mr-1 flex h-3 items-end gap-0.5" aria-hidden>
+              <span className="eq-bar" />
+              <span className="eq-bar" style={{ animationDelay: '0.15s' }} />
+              <span className="eq-bar" style={{ animationDelay: '0.3s' }} />
+            </span>
+          )}
+          <button
+            type="button"
+            className="grid h-10 w-8 place-items-center"
+            aria-expanded={open}
+            aria-label="Şarkı ve ses"
+            onClick={() => setOpen((value) => !value)}
+          >
+            <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>

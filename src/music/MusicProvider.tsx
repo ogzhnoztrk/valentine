@@ -13,6 +13,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const indexRef = useRef(0)
   const playingRef = useRef(false)
   const volumeRef = useRef(siteConfig.music.defaultVolume)
+  /** İlk açılışta otomatik başlat; kullanıcı duraklatınca bir daha zorlama. */
+  const autoUnlockRef = useRef(true)
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [volume, setVolumeState] = useState(siteConfig.music.defaultVolume)
@@ -65,6 +67,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         }
         if (requestId !== requestRef.current) return
         playingRef.current = true
+        autoUnlockRef.current = false
         setPlaying(true)
         setHint(null)
       } catch {
@@ -78,6 +81,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   )
 
   const pause = useCallback(async () => {
+    autoUnlockRef.current = false
     requestRef.current += 1
     playingRef.current = false
     setPlaying(false)
@@ -91,6 +95,40 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
     void start(indexRef.current)
   }, [pause, start])
+
+  const ensurePlaying = useCallback(() => {
+    if (playingRef.current) return
+    void start(indexRef.current)
+  }, [start])
+
+  // Site açılınca müzik dene; tarayıcı engellerse ilk dokunuşta başlat.
+  useEffect(() => {
+    void start(0)
+
+    const unlock = () => {
+      if (!autoUnlockRef.current) {
+        window.removeEventListener('pointerdown', unlock, true)
+        window.removeEventListener('keydown', unlock, true)
+        window.removeEventListener('touchstart', unlock, true)
+        return
+      }
+      if (playingRef.current) {
+        autoUnlockRef.current = false
+        return
+      }
+      void start(indexRef.current)
+    }
+
+    window.addEventListener('pointerdown', unlock, true)
+    window.addEventListener('keydown', unlock, true)
+    window.addEventListener('touchstart', unlock, { capture: true, passive: true })
+
+    return () => {
+      window.removeEventListener('pointerdown', unlock, true)
+      window.removeEventListener('keydown', unlock, true)
+      window.removeEventListener('touchstart', unlock, true)
+    }
+  }, [start])
 
   const changeTrack = useCallback(
     (nextIndex: number) => {
@@ -125,11 +163,12 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       track: tracks[index] ?? tracks[0],
       hint,
       toggle,
+      ensurePlaying,
       next,
       previous,
       setVolume,
     }),
-    [playing, volume, index, hint, toggle, next, previous, setVolume],
+    [playing, volume, index, hint, toggle, ensurePlaying, next, previous, setVolume],
   )
 
   return <MusicContext value={value}>{children}</MusicContext>

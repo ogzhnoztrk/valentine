@@ -41,12 +41,13 @@ export const siteConfig = {
       },
       {
         front: 'Biliyor musun?',
-        back: 'Bazen ufacık bir mesajımla modumu yukltebiliyorsun ve beni mutlu edebiliysun :)',
+        back: 'Bazen ufacık bir mesajımla modumu yükseltebiliyorsun ve beni çoook mutlu edeysun :)',
       },
       {
         front: 'Bir sır daha...',
         back: 'Sana sandığından daha çok önem veriyorum......',
       },
+
     ],
   },
 
@@ -73,11 +74,11 @@ export const siteConfig = {
     /** Polaroidun altındaki küçük satır. Boşsa sevgilinin adı, o da boşsa kalp görünür. */
     polaroidNote: 'Rümeysamm',
     lines: [
-      'Seninle geçireceğim daha nice güzel günlere...',
+      'Seninle geçireceğimiz daha nice güzel günlere...',
       'Daha çok kahkahaya, daha çok anıya, daha çok sarılmaya, daha çok öpücüğe...',
       'İyi ki varsın. ❤️',
     ],
-    closing: 'Bu daha başlangıç...',
+    closing: 'Bu daha başlangıç...  Doğru kalbi bulursan bir sürpriz daha vaar.',
   },
 
   secret: {
